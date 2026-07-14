@@ -49,31 +49,32 @@ export default async function AdminDashboard() {
   ])
 
   const STATS = [
-    { label: 'Total Posts',     value: total,          color: 'text-blue-400',    bg: 'bg-blue-500/[0.08]',    Icon: FileText     },
-    { label: 'Published',       value: published,      color: 'text-emerald-400', bg: 'bg-emerald-500/[0.08]', Icon: CheckCircle  },
-    { label: 'Drafts',          value: drafts,         color: 'text-amber-400',   bg: 'bg-amber-500/[0.08]',   Icon: Clock        },
-    { label: 'Price Overrides', value: priceOverrides, color: 'text-purple-400',  bg: 'bg-purple-500/[0.08]',  Icon: DollarSign   },
+    { label: 'Total Posts',     value: total,          color: 'text-blue-400',    bg: 'bg-blue-500/[0.08]',    Icon: FileText    },
+    { label: 'Published',       value: published,      color: 'text-emerald-400', bg: 'bg-emerald-500/[0.08]', Icon: CheckCircle },
+    { label: 'Drafts',          value: drafts,         color: 'text-amber-400',   bg: 'bg-amber-500/[0.08]',   Icon: Clock       },
+    { label: 'Price Overrides', value: priceOverrides, color: 'text-purple-400',  bg: 'bg-purple-500/[0.08]',  Icon: DollarSign  },
   ]
 
   const ACTIONS = [
-    { href: '/admin/blog/new',  label: 'New Blog Post',    Icon: Plus,       desc: 'Write and publish a devlog or article',   iconCls: 'text-blue-400'    },
-    { href: '/admin/pricing',   label: 'Edit Pricing',     Icon: DollarSign, desc: 'Override plan prices on the live site',   iconCls: 'text-cyan-400'    },
-    { href: '/admin/projects',  label: 'Manage Projects',  Icon: FolderOpen, desc: 'Show/hide projects and add custom ones',  iconCls: 'text-indigo-400'  },
-    { href: '/admin/inbox',     label: 'View Inbox',       Icon: Mail,       desc: `${unreadInbox} unread message${unreadInbox !== 1 ? 's' : ''}`, iconCls: 'text-emerald-400' },
+    { href: '/admin/blog/new', label: 'New Blog Post',   Icon: Plus,       desc: 'Write and publish a devlog',             iconCls: 'text-blue-400',    bg: 'bg-blue-500/[0.08]'    },
+    { href: '/admin/pricing',  label: 'Edit Pricing',    Icon: DollarSign, desc: 'Override plan prices on the live site',  iconCls: 'text-cyan-400',    bg: 'bg-cyan-500/[0.08]'    },
+    { href: '/admin/projects', label: 'Manage Projects', Icon: FolderOpen, desc: 'Show/hide and add custom projects',       iconCls: 'text-indigo-400',  bg: 'bg-indigo-500/[0.08]'  },
+    { href: '/admin/inbox',    label: 'View Inbox',      Icon: Mail,       desc: `${unreadInbox} unread message${unreadInbox !== 1 ? 's' : ''}`, iconCls: 'text-emerald-400', bg: 'bg-emerald-500/[0.08]' },
   ]
 
   return (
-    <div>
-      <div className="mb-8">
+    <div className="space-y-8">
+      {/* Header */}
+      <div>
         <h1 className="text-2xl font-bold text-white">Dashboard</h1>
         <p className="text-slate-500 text-sm mt-1">Welcome back, Anthony.</p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {STATS.map(s => (
           <div key={s.label} className="bg-dark-900 rounded-xl border border-white/[0.06] p-5">
-            <div className={`w-9 h-9 rounded-lg ${s.bg} flex items-center justify-center mb-3`}>
+            <div className={`w-9 h-9 rounded-lg ${s.bg} flex items-center justify-center mb-4`}>
               <s.Icon size={16} className={s.color} />
             </div>
             <div className={`text-3xl font-bold font-mono ${s.color}`}>{s.value}</div>
@@ -82,31 +83,52 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
+      {/* Quick actions */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {ACTIONS.map(a => (
+          <Link
+            key={a.href}
+            href={a.href}
+            className="bg-dark-900 rounded-xl border border-white/[0.06] p-5 hover:border-white/[0.12] hover:bg-white/[0.02] transition-all duration-200 group"
+          >
+            <div className={`w-9 h-9 rounded-lg ${a.bg} flex items-center justify-center mb-4`}>
+              <a.Icon size={16} className={a.iconCls} />
+            </div>
+            <div className="font-medium text-white text-sm">{a.label}</div>
+            <div className="text-xs text-slate-500 mt-1 leading-relaxed">{a.desc}</div>
+          </Link>
+        ))}
+      </div>
+
       {/* Availability + Recent Activity */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <AvailabilityToggle />
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest font-mono">Recent Activity</h2>
-            <Link href="/admin/logs" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">View all →</Link>
+
+        {/* Recent Activity — header inside card to match AvailabilityToggle */}
+        <div className="bg-dark-900 rounded-xl border border-white/[0.06] overflow-hidden flex flex-col">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+            <div>
+              <div className="text-sm font-semibold text-white">Recent Activity</div>
+              <div className="text-xs text-slate-500 mt-0.5">Last 5 admin actions</div>
+            </div>
+            <Link href="/admin/logs" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+              View all →
+            </Link>
           </div>
           {recentLogs.length === 0 ? (
-            <div className="bg-dark-900 rounded-xl border border-white/[0.06] flex items-center justify-center py-10">
+            <div className="flex-1 flex items-center justify-center py-10">
               <div className="text-center">
                 <Activity size={20} className="mx-auto text-slate-700 mb-2" />
                 <p className="text-xs text-slate-600">No activity yet.</p>
               </div>
             </div>
           ) : (
-            <div className="bg-dark-900 rounded-xl border border-white/[0.06] overflow-hidden">
-              {recentLogs.map((log, i) => {
+            <div className="divide-y divide-white/[0.04]">
+              {recentLogs.map(log => {
                 const color = LOG_COLORS[log.action] ?? 'text-slate-400 bg-slate-800/50 border-slate-700/50'
                 const ts = new Date(log.createdAt)
                 return (
-                  <div
-                    key={log.id}
-                    className={`flex items-center gap-3 px-4 py-3 hover:bg-white/[0.015] transition-colors ${i < recentLogs.length - 1 ? 'border-b border-white/[0.04]' : ''}`}
-                  >
+                  <div key={log.id} className="flex items-center gap-3 px-5 py-3 hover:bg-white/[0.015] transition-colors">
                     <span className={`text-[10px] font-mono px-2 py-0.5 rounded border flex-shrink-0 ${color}`}>
                       {log.action.replace(/_/g, ' ')}
                     </span>
@@ -122,43 +144,30 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      {/* Quick actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {ACTIONS.map(a => (
-          <Link
-            key={a.href}
-            href={a.href}
-            className="bg-dark-900 rounded-xl border border-white/[0.06] p-5 hover:border-blue-500/20 hover:bg-blue-500/[0.02] transition-all group"
-          >
-            <a.Icon size={20} className={`${a.iconCls} mb-3`} />
-            <div className="font-medium text-white group-hover:text-blue-200 transition-colors">{a.label}</div>
-            <div className="text-sm text-slate-500 mt-1">{a.desc}</div>
-          </Link>
-        ))}
-      </div>
-
       {/* Recent posts */}
       {recentPosts.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest font-mono">Recent Posts</h2>
-            <Link href="/admin/blog" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">View all →</Link>
+        <div className="bg-dark-900 rounded-xl border border-white/[0.06] overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+            <div>
+              <div className="text-sm font-semibold text-white">Recent Posts</div>
+              <div className="text-xs text-slate-500 mt-0.5">{total} post{total !== 1 ? 's' : ''} total</div>
+            </div>
+            <Link href="/admin/blog" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+              View all →
+            </Link>
           </div>
-          <div className="bg-dark-900 rounded-xl border border-white/[0.06] overflow-hidden">
-            {recentPosts.map((post, i) => (
-              <div
-                key={post.id}
-                className={`flex items-center justify-between px-5 py-3.5 hover:bg-white/[0.015] transition-colors ${i < recentPosts.length - 1 ? 'border-b border-white/[0.04]' : ''}`}
-              >
+          <div className="divide-y divide-white/[0.04]">
+            {recentPosts.map(post => (
+              <div key={post.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-white/[0.015] transition-colors">
                 <Link href={`/admin/blog/${post.id}`} className="text-sm text-white hover:text-blue-300 transition-colors font-medium truncate">
                   {post.title}
                 </Link>
                 <div className="flex items-center gap-3 flex-shrink-0 ml-4">
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${post.published ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700/50 text-slate-500'}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${post.published ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800/60 text-slate-500'}`}>
                     {post.published ? 'Published' : 'Draft'}
                   </span>
-                  <span className="text-xs text-slate-600 hidden sm:block">
-                    {new Date(post.createdAt).toLocaleDateString()}
+                  <span className="text-xs text-slate-600 hidden sm:block tabular-nums">
+                    {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </span>
                 </div>
               </div>
