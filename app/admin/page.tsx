@@ -28,12 +28,11 @@ const LOG_COLORS: Record<string, string> = {
 export const dynamic = 'force-dynamic'
 
 export default async function AdminDashboard() {
-  const [total, published, drafts, priceOverrides, unreadInbox] = await Promise.all([
+  const [total, published, drafts, priceOverrides] = await Promise.all([
     db.post.count(),
     db.post.count({ where: { published: true  } }),
     db.post.count({ where: { published: false } }),
     db.priceOverride.count(),
-    db.contactSubmission.count({ where: { status: 'unread' } }),
   ])
 
   const [recentPosts, recentLogs] = await Promise.all([
@@ -56,10 +55,10 @@ export default async function AdminDashboard() {
   ]
 
   const ACTIONS = [
-    { href: '/admin/blog/new', label: 'New Blog Post',   Icon: Plus,       desc: 'Write and publish a devlog',             iconCls: 'text-blue-400',    bg: 'bg-blue-500/[0.08]'    },
-    { href: '/admin/pricing',  label: 'Edit Pricing',    Icon: DollarSign, desc: 'Override plan prices on the live site',  iconCls: 'text-cyan-400',    bg: 'bg-cyan-500/[0.08]'    },
-    { href: '/admin/projects', label: 'Manage Projects', Icon: FolderOpen, desc: 'Show/hide and add custom projects',       iconCls: 'text-indigo-400',  bg: 'bg-indigo-500/[0.08]'  },
-    { href: '/admin/inbox',    label: 'View Inbox',      Icon: Mail,       desc: `${unreadInbox} unread message${unreadInbox !== 1 ? 's' : ''}`, iconCls: 'text-emerald-400', bg: 'bg-emerald-500/[0.08]' },
+    { href: '/admin/blog/new', label: 'New Blog Post',   Icon: Plus,       iconCls: 'text-blue-400',    bg: 'bg-blue-500/[0.08]'    },
+    { href: '/admin/pricing',  label: 'Edit Pricing',    Icon: DollarSign, iconCls: 'text-cyan-400',    bg: 'bg-cyan-500/[0.08]'    },
+    { href: '/admin/projects', label: 'Manage Projects', Icon: FolderOpen, iconCls: 'text-indigo-400',  bg: 'bg-indigo-500/[0.08]'  },
+    { href: '/admin/inbox',    label: 'View Inbox',      Icon: Mail,       iconCls: 'text-emerald-400', bg: 'bg-emerald-500/[0.08]' },
   ]
 
   return (
@@ -95,7 +94,6 @@ export default async function AdminDashboard() {
               <a.Icon size={16} className={a.iconCls} />
             </div>
             <div className="font-medium text-white text-sm">{a.label}</div>
-            <div className="text-xs text-slate-500 mt-1 leading-relaxed">{a.desc}</div>
           </Link>
         ))}
       </div>
