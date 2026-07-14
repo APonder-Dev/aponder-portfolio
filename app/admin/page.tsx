@@ -82,76 +82,9 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      {/* Availability + Inbox */}
+      {/* Availability + Recent Activity */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <AvailabilityToggle />
-        <Link
-          href="/admin/inbox"
-          className="bg-dark-900 rounded-xl border border-white/[0.06] p-5 hover:border-blue-500/20 transition-all group"
-        >
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="text-sm font-semibold text-white group-hover:text-blue-200 transition-colors">Contact Inbox</div>
-              <div className="text-xs text-slate-500 mt-1">Form submissions from your portfolio</div>
-            </div>
-            {unreadInbox > 0 && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono flex-shrink-0">
-                {unreadInbox} new
-              </span>
-            )}
-          </div>
-          <div className={`text-2xl font-bold mt-3 ${unreadInbox > 0 ? 'text-blue-400' : 'text-slate-600'}`}>
-            {unreadInbox > 0 ? `${unreadInbox} unread` : 'No new messages'}
-          </div>
-        </Link>
-      </div>
-
-      {/* Quick actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {ACTIONS.map(a => (
-          <Link
-            key={a.href}
-            href={a.href}
-            className="bg-dark-900 rounded-xl border border-white/[0.06] p-5 hover:border-blue-500/20 hover:bg-blue-500/[0.02] transition-all group"
-          >
-            <a.Icon size={20} className={`${a.iconCls} mb-3`} />
-            <div className="font-medium text-white group-hover:text-blue-200 transition-colors">{a.label}</div>
-            <div className="text-sm text-slate-500 mt-1">{a.desc}</div>
-          </Link>
-        ))}
-      </div>
-
-      {/* Recent posts + Recent activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {recentPosts.length > 0 && (
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest font-mono">Recent Posts</h2>
-              <Link href="/admin/blog" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">View all →</Link>
-            </div>
-            <div className="bg-dark-900 rounded-xl border border-white/[0.06] overflow-hidden">
-              {recentPosts.map((post, i) => (
-                <div
-                  key={post.id}
-                  className={`flex items-center justify-between px-5 py-3.5 hover:bg-white/[0.015] transition-colors ${i < recentPosts.length - 1 ? 'border-b border-white/[0.04]' : ''}`}
-                >
-                  <Link href={`/admin/blog/${post.id}`} className="text-sm text-white hover:text-blue-300 transition-colors font-medium truncate">
-                    {post.title}
-                  </Link>
-                  <div className="flex items-center gap-3 flex-shrink-0 ml-4">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${post.published ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700/50 text-slate-500'}`}>
-                      {post.published ? 'Published' : 'Draft'}
-                    </span>
-                    <span className="text-xs text-slate-600 hidden sm:block">
-                      {new Date(post.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         <div>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest font-mono">Recent Activity</h2>
@@ -188,6 +121,51 @@ export default async function AdminDashboard() {
           )}
         </div>
       </div>
+
+      {/* Quick actions */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {ACTIONS.map(a => (
+          <Link
+            key={a.href}
+            href={a.href}
+            className="bg-dark-900 rounded-xl border border-white/[0.06] p-5 hover:border-blue-500/20 hover:bg-blue-500/[0.02] transition-all group"
+          >
+            <a.Icon size={20} className={`${a.iconCls} mb-3`} />
+            <div className="font-medium text-white group-hover:text-blue-200 transition-colors">{a.label}</div>
+            <div className="text-sm text-slate-500 mt-1">{a.desc}</div>
+          </Link>
+        ))}
+      </div>
+
+      {/* Recent posts */}
+      {recentPosts.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest font-mono">Recent Posts</h2>
+            <Link href="/admin/blog" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">View all →</Link>
+          </div>
+          <div className="bg-dark-900 rounded-xl border border-white/[0.06] overflow-hidden">
+            {recentPosts.map((post, i) => (
+              <div
+                key={post.id}
+                className={`flex items-center justify-between px-5 py-3.5 hover:bg-white/[0.015] transition-colors ${i < recentPosts.length - 1 ? 'border-b border-white/[0.04]' : ''}`}
+              >
+                <Link href={`/admin/blog/${post.id}`} className="text-sm text-white hover:text-blue-300 transition-colors font-medium truncate">
+                  {post.title}
+                </Link>
+                <div className="flex items-center gap-3 flex-shrink-0 ml-4">
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${post.published ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700/50 text-slate-500'}`}>
+                    {post.published ? 'Published' : 'Draft'}
+                  </span>
+                  <span className="text-xs text-slate-600 hidden sm:block">
+                    {new Date(post.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
