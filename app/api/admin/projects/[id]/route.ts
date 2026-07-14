@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { logAction } from '@/lib/logger'
 
 export async function PATCH(
   req: NextRequest,
@@ -30,6 +31,7 @@ export async function PATCH(
       ...(body.sortOrder    !== undefined && { sortOrder:    body.sortOrder }),
     },
   })
+  await logAction('project_updated', project.name)
 
   return NextResponse.json(project)
 }
@@ -40,6 +42,8 @@ export async function DELETE(
 ) {
   const { id: rawId } = await params
   const id = parseInt(rawId)
+  const existing = await db.customProject.findUnique({ where: { id }, select: { name: true } })
   await db.customProject.delete({ where: { id } })
+  await logAction('project_deleted', existing?.name ?? `id:${id}`)
   return NextResponse.json({ ok: true })
 }

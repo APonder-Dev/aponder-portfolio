@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { logAction } from '@/lib/logger'
 
 export async function GET(
   _req: NextRequest,
@@ -21,5 +22,6 @@ export async function PUT(
     create: { key, value: JSON.stringify(body) },
     update: { value: JSON.stringify(body) },
   })
+  await logAction('content_updated', key)
   return NextResponse.json({ ok: true })
 }

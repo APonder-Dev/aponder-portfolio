@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { logAction } from '@/lib/logger'
 
 export async function PATCH(
   req: NextRequest,
@@ -13,6 +14,7 @@ export async function PATCH(
     where: { id },
     data:  { status },
   })
+  if (status === 'archived') await logAction('inbox_archived', submission.email ?? `id:${id}`)
   return NextResponse.json(submission)
 }
 
@@ -22,6 +24,8 @@ export async function DELETE(
 ) {
   const { id: rawId } = await params
   const id = parseInt(rawId)
+  const existing = await db.contactSubmission.findUnique({ where: { id }, select: { email: true } })
   await db.contactSubmission.delete({ where: { id } })
+  await logAction('inbox_deleted', existing?.email ?? `id:${id}`)
   return NextResponse.json({ ok: true })
 }

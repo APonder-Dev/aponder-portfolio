@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { logAction } from '@/lib/logger'
 
 export async function GET() {
   const [hidden, custom] = await Promise.all([
@@ -42,5 +43,6 @@ export async function POST(req: NextRequest) {
     },
   })
 
+  await logAction('project_created', project.name)
   return NextResponse.json(project, { status: 201 })
 }

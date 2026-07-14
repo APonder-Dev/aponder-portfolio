@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readdir, unlink, stat } from 'fs/promises'
 import path from 'path'
+import { logAction } from '@/lib/logger'
 
 const uploadDir = path.join(process.cwd(), 'public', 'uploads')
 
@@ -29,6 +30,7 @@ export async function DELETE(req: NextRequest) {
   }
   try {
     await unlink(path.join(uploadDir, name))
+    await logAction('media_deleted', name)
     return NextResponse.json({ ok: true })
   } catch {
     return NextResponse.json({ error: 'File not found.' }, { status: 404 })
