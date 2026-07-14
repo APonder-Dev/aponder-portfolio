@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id          Int       @id @default(autoincrement())
+  title       String
+  slug        String    @unique
+  excerpt     String    @default("")
+  content     String    @default("")
+  coverImage  String    @default("")
+  tags        String    @default("[]")
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  views       Int       @default(0)
+  series      String    @default("")
+  seriesOrder Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Subscriber {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String   @default("")
+  createdAt DateTime @default(now())
+}
+
+model AdminLog {
+  id        Int      @id @default(autoincrement())
+  action    String
+  detail    String   @default("")
+  createdAt DateTime @default(now())
+}
+
+model RateLimit {
+  ip        String   @id
+  count     Int      @default(0)
+  resetAt   DateTime
+  updatedAt DateTime @updatedAt
+}
+
+model ContactSubmission {
+  id          Int      @id @default(autoincrement())
+  name        String
+  email       String
+  projectType String   @default("")
+  budget      String   @default("")
+  message     String
+  status      String   @default("unread")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PriceOverride {
+  planId    String   @id
+  price     String
+  updatedAt DateTime @updatedAt
+}
+
+model ProjectHide {
+  projectId String   @id
+  createdAt DateTime @default(now())
+}
+
+model SiteContent {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model CustomProject {
+  id           Int      @id @default(autoincrement())
+  name         String
+  typeLabel    String   @default("Project")
+  description  String   @default("")
+  stack        String   @default("[]")
+  status       String   @default("active")
+  statusLabel  String   @default("Active")
+  featured     Boolean  @default(false)
+  accentColor  String   @default("blue")
+  githubUrl    String   @default("")
+  highlights   String   @default("[]")
+  architecture String   @default("")
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
