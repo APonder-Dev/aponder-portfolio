@@ -136,7 +136,7 @@ export default async function BlogPostPage({ params }: Props) {
       <CopyCodeEnhancer />
 
       <div className={`mx-auto px-4 py-28 ${hasToc ? 'max-w-5xl' : 'max-w-3xl'}`}>
-        <Link href="/blog" className="text-sm text-slate-500 hover:text-white transition-colors mb-10 block">
+        <Link href="/blog" className="text-sm text-slate-500 hover:text-slate-900 transition-colors mb-10 block">
           ← All posts
         </Link>
 
@@ -170,7 +170,7 @@ export default async function BlogPostPage({ params }: Props) {
               {post.excerpt && (
                 <p className="text-slate-400 mt-4 text-lg leading-relaxed">{post.excerpt}</p>
               )}
-              <div className="flex items-center gap-3 mt-6 pt-6 border-t border-white/[0.05]">
+              <div className="flex items-center gap-3 mt-6 pt-6 border-t border-white/[0.08]">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
                   A
                 </div>
@@ -219,8 +219,8 @@ export default async function BlogPostPage({ params }: Props) {
             </article>
 
             {/* Social share */}
-            <div className="mt-12 pt-8 border-t border-white/[0.05]">
-              <p className="text-xs text-slate-600 font-mono uppercase tracking-widest mb-3">Share</p>
+            <div className="mt-12 pt-8 border-t border-white/[0.08]">
+              <p className="text-xs text-slate-500 font-mono uppercase tracking-widest mb-3">Share</p>
               <div className="flex items-center gap-3">
                 <a
                   href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(post.title)}`}
@@ -243,8 +243,8 @@ export default async function BlogPostPage({ params }: Props) {
 
             <NewsletterSignup />
 
-            <footer className="mt-8 pt-8 border-t border-white/[0.05] flex items-center justify-between flex-wrap gap-4">
-              <Link href="/blog" className="text-sm text-slate-500 hover:text-white transition-colors">
+            <footer className="mt-8 pt-8 border-t border-white/[0.08] flex items-center justify-between flex-wrap gap-4">
+              <Link href="/blog" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">
                 ← Back to all posts
               </Link>
               {tags.length > 0 && (

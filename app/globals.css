@@ -417,3 +417,39 @@ html.light-mode .scanlines [class*="bg-dark-"] {
 .prose-blog tr:hover td { background: rgba(255,255,255,0.02); }
 
 .prose-blog img { max-width: 100%; border-radius: 10px; margin: 1.5em 0; border: 1px solid rgba(255,255,255,0.06); }
+
+/* ── Blog prose — light mode overrides ──────────────────────── */
+html.light-mode .prose-blog { color: #1e293b; }
+
+html.light-mode .prose-blog h1,
+html.light-mode .prose-blog h2,
+html.light-mode .prose-blog h3,
+html.light-mode .prose-blog h4 { color: #0f172a; }
+
+html.light-mode .prose-blog h2 { border-bottom-color: rgba(0,0,0,0.08); }
+
+html.light-mode .prose-blog a       { color: #2563eb; }
+html.light-mode .prose-blog a:hover { color: #1d4ed8; }
+
+html.light-mode .prose-blog code {
+  background:   rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.1);
+  color:        #1e40af;
+}
+
+html.light-mode .prose-blog blockquote {
+  background: rgba(59,130,246,0.06);
+  color:      #475569;
+}
+
+html.light-mode .prose-blog hr { border-top-color: rgba(0,0,0,0.1); }
+
+html.light-mode .prose-blog th {
+  background: rgba(0,0,0,0.04);
+  color:      #0f172a;
+}
+html.light-mode .prose-blog th,
+html.light-mode .prose-blog td { border-color: rgba(0,0,0,0.09); }
+html.light-mode .prose-blog tr:hover td { background: rgba(0,0,0,0.02); }
+
+html.light-mode .prose-blog img { border-color: rgba(0,0,0,0.08); }
