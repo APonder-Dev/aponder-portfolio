@@ -212,7 +212,16 @@ html.light-mode body {
 
 /* ── Page / section backgrounds ──────────────────────────── */
 html.light-mode main { background-color: #f1f5f9 !important; }
-html.light-mode [class*="bg-dark-"] { background-color: #f1f5f9 !important; }
+/* bg-dark-* → white cards; bg-dark-950 (page bg) → light gray */
+html.light-mode [class*="bg-dark-"]    { background-color: #ffffff !important; }
+html.light-mode [class*="bg-dark-950"] { background-color: #f1f5f9 !important; }
+/* Card elements (bg-dark + border-white combination) get a subtle lift */
+html.light-mode [class*="bg-dark-"][class*="border-white/"] {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04) !important;
+}
+/* Form inputs always white regardless of dark variant */
+html.light-mode input[class*="bg-dark-"],
+html.light-mode textarea[class*="bg-dark-"] { background-color: #ffffff !important; }
 
 /* ── Text: remap dark-optimised slate scale to light scale ── */
 html.light-mode .text-white     { color: #0f172a !important; }
@@ -220,17 +229,24 @@ html.light-mode .text-slate-100 { color: #1e293b !important; }
 html.light-mode .text-slate-200 { color: #334155 !important; }
 html.light-mode .text-slate-300 { color: #475569 !important; }
 html.light-mode .text-slate-400 { color: #64748b !important; }
-html.light-mode .text-slate-500 { color: #94a3b8 !important; }
-html.light-mode .text-slate-600 { color: #b0bec5 !important; }
-html.light-mode .text-slate-700 { color: #cfd8e3 !important; }
+html.light-mode .text-slate-500 { color: #64748b !important; }
+html.light-mode .text-slate-600 { color: #64748b !important; }
+html.light-mode .text-slate-700 { color: #94a3b8 !important; }
 /* Tailwind opacity-modifier variants not caught by .text-white above */
 html.light-mode .text-white\/35 { color: rgba(15, 23, 42, 0.35) !important; }
 html.light-mode .text-white\/15 { color: rgba(15, 23, 42, 0.15) !important; }
 
-/* ── Cards: near-transparent-on-dark → solid white on light ─ */
+/* ── Hover states: prevent invisible text on hover in light mode ── */
+html.light-mode [class*="hover:text-white"]:hover   { color: #0f172a !important; }
+html.light-mode [class*="hover:text-slate-3"]:hover { color: #475569 !important; }
+
+/* ── Group-hover: darker blues readable on light backgrounds ── */
+html.light-mode .group:hover [class*="group-hover:text-blue-3"],
+html.light-mode .group:hover [class*="group-hover:text-blue-4"] { color: #2563eb !important; }
+
+/* ── Cards: near-transparent-on-dark → subtle white on light ─ */
 html.light-mode [class*="bg-white/"] {
-  background-color: rgba(255, 255, 255, 0.88) !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.04) !important;
+  background-color: rgba(255, 255, 255, 0.75) !important;
 }
 
 /* ── Borders: white/invisible on dark → visible gray on light  */
