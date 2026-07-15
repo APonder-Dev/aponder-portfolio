@@ -198,32 +198,55 @@ body {
 }
 
 /* ══════════════════════════════════════════════════════════
-   LIGHT MODE — COMPREHENSIVE OVERRIDES
-   Uses attribute selectors + descendant specificity to beat
-   Tailwind utility classes (spec 0-1-0) without touching
-   every component. Terminal card is explicitly re-darkened.
+   LIGHT MODE — DESIGN SYSTEM
+   Selector specificity guide:
+     html.light-mode [attr]          = (0,2,1) — general overrides
+     html.light-mode element[attr]   = (0,2,2) — element-specific beats general
+   Terminal card (.scanlines) re-darkened at end.
    ══════════════════════════════════════════════════════════ */
 
+/* ── Base ─────────────────────────────────────────────────── */
 html.light-mode,
 html.light-mode body {
-  background-color: #f1f5f9;
-  color: #1e293b;
+  background-color: #f8fafc;
+  color: #0f172a;
 }
 
-/* ── Page / section backgrounds ──────────────────────────── */
-html.light-mode main { background-color: #f1f5f9 !important; }
-/* bg-dark-* → white cards; bg-dark-950 (page bg) → light gray */
-html.light-mode [class*="bg-dark-"]    { background-color: #ffffff !important; }
-html.light-mode [class*="bg-dark-950"] { background-color: #f1f5f9 !important; }
-/* Card elements (bg-dark + border-white combination) get a subtle lift */
+/* ── Surface hierarchy ────────────────────────────────────── */
+html.light-mode main                  { background-color: #f8fafc !important; }
+/* bg-dark-* cards → white */
+html.light-mode [class*="bg-dark-"]   { background-color: #ffffff !important; }
+/* bg-dark-950 (page bg) → page color, placed after to win */
+html.light-mode [class*="bg-dark-950"] { background-color: #f8fafc !important; }
+/* Card elevation: bg-dark + border = raised surface */
 html.light-mode [class*="bg-dark-"][class*="border-white/"] {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04) !important;
+  box-shadow: 0 1px 3px rgba(15,23,42,0.05), 0 6px 24px rgba(15,23,42,0.09) !important;
 }
-/* Form inputs always white regardless of dark variant */
+/* Form inputs always pure white */
 html.light-mode input[class*="bg-dark-"],
 html.light-mode textarea[class*="bg-dark-"] { background-color: #ffffff !important; }
 
-/* ── Text: remap dark-optimised slate scale to light scale ── */
+/* ── Section rhythm ───────────────────────────────────────── */
+/* Hero: blue atmosphere at the top of the page */
+html.light-mode #hero {
+  background: linear-gradient(175deg, #dbeafe 0%, #e0f2fe 25%, #f8fafc 65%) !important;
+}
+/* Alternating tinted sections */
+html.light-mode #about,
+html.light-mode #skills,
+html.light-mode #process,
+html.light-mode #faq { background-color: #f1f5f9 !important; }
+
+/* ── Borders ──────────────────────────────────────────────── */
+html.light-mode [class*="border-white/"] { border-color: rgba(15,23,42,0.1) !important; }
+
+/* ── bg-white/ overlays → transparent on light backgrounds ── */
+html.light-mode [class*="bg-white/"]               { background-color: transparent !important; }
+/* Exception: hover states need a visible slate tint */
+html.light-mode [class*="hover:bg-white/"]:hover   { background-color: rgba(15,23,42,0.05) !important; }
+html.light-mode [class*="hover:bg-blue-5"]:hover   { background-color: rgba(59,130,246,0.07) !important; }
+
+/* ── Text scale ───────────────────────────────────────────── */
 html.light-mode .text-white     { color: #0f172a !important; }
 html.light-mode .text-slate-100 { color: #1e293b !important; }
 html.light-mode .text-slate-200 { color: #334155 !important; }
@@ -232,110 +255,122 @@ html.light-mode .text-slate-400 { color: #64748b !important; }
 html.light-mode .text-slate-500 { color: #64748b !important; }
 html.light-mode .text-slate-600 { color: #64748b !important; }
 html.light-mode .text-slate-700 { color: #94a3b8 !important; }
-/* Tailwind opacity-modifier variants not caught by .text-white above */
-html.light-mode .text-white\/35 { color: rgba(15, 23, 42, 0.35) !important; }
-html.light-mode .text-white\/15 { color: rgba(15, 23, 42, 0.15) !important; }
+html.light-mode .text-white\/35 { color: rgba(15,23,42,0.35) !important; }
+html.light-mode .text-white\/15 { color: rgba(15,23,42,0.15) !important; }
 
-/* ── Hover states: prevent invisible text on hover in light mode ── */
+/* ── Hover text states ────────────────────────────────────── */
 html.light-mode [class*="hover:text-white"]:hover   { color: #0f172a !important; }
-html.light-mode [class*="hover:text-slate-3"]:hover { color: #475569 !important; }
-
-/* ── Group-hover: darker blues readable on light backgrounds ── */
+html.light-mode [class*="hover:text-slate-3"]:hover { color: #334155 !important; }
 html.light-mode .group:hover [class*="group-hover:text-blue-3"],
-html.light-mode .group:hover [class*="group-hover:text-blue-4"] { color: #2563eb !important; }
+html.light-mode .group:hover [class*="group-hover:text-blue-4"] { color: #1d4ed8 !important; }
 
-/* ── Cards: near-transparent-on-dark → subtle white on light ─ */
-html.light-mode [class*="bg-white/"] {
-  background-color: rgba(255, 255, 255, 0.75) !important;
+/* ── Header: frosted glass when scrolled ─────────────────── */
+/* Specificity (0,2,2) beats the general bg-dark rule (0,2,1) */
+html.light-mode header[class*="bg-dark-"] {
+  background-color: rgba(248,250,252,0.90) !important;
+  border-color: rgba(15,23,42,0.08) !important;
+}
+/* Mobile nav panel inside header */
+html.light-mode header [class*="bg-dark-950"] {
+  background-color: rgba(248,250,252,0.98) !important;
 }
 
-/* ── Borders: white/invisible on dark → visible gray on light  */
-html.light-mode [class*="border-white/"] {
-  border-color: rgba(0, 0, 0, 0.09) !important;
+/* ── Footer ──────────────────────────────────────────────── */
+html.light-mode footer {
+  background-color: #f1f5f9 !important;
+  border-color: rgba(15,23,42,0.08) !important;
 }
 
-/* ── Header specific ─────────────────────────────────────── */
-html.light-mode header {
-  background-color: rgba(241, 245, 249, 0.92) !important;
-  border-color: rgba(0, 0, 0, 0.07) !important;
-}
-html.light-mode header.bg-transparent {
-  background-color: rgba(241, 245, 249, 0.85) !important;
+/* ── Glass surfaces ───────────────────────────────────────── */
+html.light-mode .glass,
+html.light-mode .glass-card {
+  background: rgba(255,255,255,0.90) !important;
+  border-color: rgba(15,23,42,0.08) !important;
+  box-shadow: 0 4px 24px rgba(15,23,42,0.08) !important;
 }
 
-/* ── Grid patterns: more visible on light bg ─────────────── */
+/* ── Grid patterns ────────────────────────────────────────── */
 html.light-mode .grid-bg {
   background-image:
-    linear-gradient(rgba(59, 130, 246, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59, 130, 246, 0.07) 1px, transparent 1px);
+    linear-gradient(rgba(59,130,246,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.08) 1px, transparent 1px);
 }
 html.light-mode .blueprint-grid {
   background-image:
-    linear-gradient(rgba(6, 182, 212, 0.1)  1px, transparent 1px),
-    linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px),
-    linear-gradient(rgba(6, 182, 212, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(6, 182, 212, 0.035) 1px, transparent 1px);
+    linear-gradient(rgba(6,182,212,0.1)   1px, transparent 1px),
+    linear-gradient(90deg, rgba(6,182,212,0.1) 1px, transparent 1px),
+    linear-gradient(rgba(6,182,212,0.04)  1px, transparent 1px),
+    linear-gradient(90deg, rgba(6,182,212,0.04) 1px, transparent 1px);
   background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
 }
 
-/* ── Glass ───────────────────────────────────────────────── */
-html.light-mode .glass,
-html.light-mode .glass-card {
-  background: rgba(255, 255, 255, 0.82) !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
-}
-
-/* ── Scrollbar ───────────────────────────────────────────── */
-html.light-mode ::-webkit-scrollbar-track { background: #e2e8f0; }
-
-/* ── Gradient text: deeper blues on white ─────────────────── */
+/* ── Gradient text ────────────────────────────────────────── */
 html.light-mode .gradient-text {
-  background: linear-gradient(135deg, #2563eb 0%, #0891b2 50%, #4f46e5 100%) !important;
+  background: linear-gradient(135deg, #1d4ed8 0%, #0369a1 50%, #4338ca 100%) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
 }
+.light-mode .gradient-text {
+  background: linear-gradient(135deg, #1d4ed8, #0369a1, #4338ca);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
 
-/* ── Section label lines ─────────────────────────────────── */
+/* ── Section labels ───────────────────────────────────────── */
 html.light-mode .section-label         { color: #2563eb; }
 html.light-mode .section-label::before { background: linear-gradient(to right, transparent, #2563eb); }
 html.light-mode .section-label::after  { background: linear-gradient(to left,  transparent, #2563eb); }
 
-/* ── Footer ──────────────────────────────────────────────── */
-html.light-mode footer {
-  background-color: rgba(226, 232, 240, 0.85) !important;
-  border-color: rgba(0, 0, 0, 0.07) !important;
-}
+/* ── Accent colors: remap 400-level pastels → saturated for light bg ── */
+html.light-mode .text-blue-400    { color: #2563eb !important; }
+html.light-mode .text-blue-300    { color: #3b82f6 !important; }
+html.light-mode .text-cyan-400    { color: #0891b2 !important; }
+html.light-mode .text-cyan-300    { color: #0e7490 !important; }
+html.light-mode .text-green-400   { color: #16a34a !important; }
+html.light-mode .text-emerald-400 { color: #059669 !important; }
+html.light-mode .text-teal-400    { color: #0d9488 !important; }
+html.light-mode .text-purple-400  { color: #7c3aed !important; }
+html.light-mode .text-indigo-400  { color: #4f46e5 !important; }
+html.light-mode .text-orange-400  { color: #d97706 !important; }
+html.light-mode .text-red-400     { color: #dc2626 !important; }
+html.light-mode .text-amber-400   { color: #b45309 !important; }
 
-/* ══════════════════════════════════════════════════════════
-   RESTORE TERMINAL CARD TO DARK (always dark regardless of theme)
-   Higher specificity (.scanlines ancestor) beats the global overrides above.
-   ══════════════════════════════════════════════════════════ */
-html.light-mode .scanlines {
-  background-color: #090e1a !important;
-  color: inherit;
-}
-html.light-mode .scanlines .text-white     { color: #f1f5f9 !important; }
-html.light-mode .scanlines .text-slate-100 { color: #e2e8f0 !important; }
-html.light-mode .scanlines .text-slate-200 { color: #cbd5e1 !important; }
-html.light-mode .scanlines .text-slate-300 { color: #94a3b8 !important; }
-html.light-mode .scanlines .text-slate-400 { color: #64748b !important; }
-html.light-mode .scanlines .text-slate-500 { color: #475569 !important; }
-html.light-mode .scanlines .text-slate-600 { color: #334155 !important; }
-html.light-mode .scanlines [class*="bg-white/"] {
-  background-color: rgba(255, 255, 255, 0.03) !important;
-  box-shadow: none !important;
-}
-html.light-mode .scanlines [class*="border-white/"] {
-  border-color: rgba(255, 255, 255, 0.06) !important;
-}
-html.light-mode .scanlines [class*="bg-dark-"] {
-  background-color: #090e1a !important;
-}
-.light-mode .gradient-text {
-  background: linear-gradient(135deg, #2563eb, #0891b2, #4f46e5);
+/* ── Preserve white text/icons ON or INSIDE colored gradient elements ── */
+/* Specificity (0,3,1) beats the general .text-white rule (0,2,1) */
+html.light-mode [class*="from-blue-"] .text-white,
+html.light-mode [class*="text-white"][class*="from-blue-"]   { color: #ffffff !important; }
+html.light-mode [class*="from-green-"] .text-white,
+html.light-mode [class*="text-white"][class*="from-green-"]  { color: #ffffff !important; }
+html.light-mode [class*="from-emerald-"] .text-white,
+html.light-mode [class*="text-white"][class*="from-emerald-"]{ color: #ffffff !important; }
+
+/* ── Logo gradient (blue→cyan): deepen for light bg ─────── */
+html.light-mode .gradient-text-blue-cyan {
+  background: linear-gradient(to right, #2563eb, #0891b2);
   -webkit-background-clip: text;
   background-clip: text;
 }
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+html.light-mode ::-webkit-scrollbar-track { background: #e2e8f0; }
+
+/* ══════════════════════════════════════════════════════════
+   RESTORE TERMINAL CARD TO DARK (always dark regardless of theme)
+   Specificity: html.light-mode .scanlines [selector] = (0,3,1)
+   which beats everything above.
+   ══════════════════════════════════════════════════════════ */
+html.light-mode .scanlines                           { background-color: #090e1a !important; }
+html.light-mode .scanlines .text-white               { color: #f1f5f9 !important; }
+html.light-mode .scanlines .text-slate-100           { color: #e2e8f0 !important; }
+html.light-mode .scanlines .text-slate-200           { color: #cbd5e1 !important; }
+html.light-mode .scanlines .text-slate-300           { color: #94a3b8 !important; }
+html.light-mode .scanlines .text-slate-400           { color: #64748b !important; }
+html.light-mode .scanlines .text-slate-500           { color: #475569 !important; }
+html.light-mode .scanlines .text-slate-600           { color: #334155 !important; }
+html.light-mode .scanlines [class*="bg-dark-"]       { background-color: #090e1a !important; }
+html.light-mode .scanlines [class*="bg-white/"]      { background-color: rgba(255,255,255,0.03) !important; }
+html.light-mode .scanlines [class*="border-white/"]  { border-color: rgba(255,255,255,0.06) !important; }
+html.light-mode .scanlines [class*="hover:bg-white/"]:hover { background-color: rgba(255,255,255,0.06) !important; }
 
 /* ── Blog post prose ─────────────────────────────────────────── */
 .prose-blog { color: #cbd5e1; line-height: 1.85; font-size: 1rem; }
