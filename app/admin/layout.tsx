@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import {
   Terminal, LayoutDashboard, FileText, DollarSign,
   FolderOpen, ExternalLink, LogOut, Layout, Mail, Menu, X, Image,
-  Users, Settings, Activity,
+  Users, Settings, Activity, Music,
 } from 'lucide-react'
 import { AdminToastProvider } from './_AdminToastContext'
 
@@ -25,6 +25,7 @@ const NAV_GROUPS = [
       { href: '/admin/inbox',       label: 'Inbox',       Icon: Mail       },
       { href: '/admin/subscribers', label: 'Subscribers', Icon: Users      },
       { href: '/admin/media',       label: 'Media',       Icon: Image      },
+      { href: '/admin/music',       label: 'Music',       Icon: Music      },
       { href: '/admin/pricing',     label: 'Pricing',     Icon: DollarSign },
       { href: '/admin/projects',    label: 'Projects',    Icon: FolderOpen },
     ],

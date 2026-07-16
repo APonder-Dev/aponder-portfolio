@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/context/ThemeContext'
+import MusicWidget from '@/components/MusicWidget'
 import { Analytics } from '@vercel/analytics/next'
 import { MotionConfig } from 'framer-motion'
 import { db } from '@/lib/db'
@@ -101,6 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MotionConfig reducedMotion="user">
           <ThemeProvider>
             {children}
+            <MusicWidget />
           </ThemeProvider>
         </MotionConfig>
         <Analytics />

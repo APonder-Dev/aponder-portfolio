@@ -504,3 +504,71 @@ html.light-mode .prose-blog td { border-color: rgba(0,0,0,0.09); }
 html.light-mode .prose-blog tr:hover td { background: rgba(0,0,0,0.02); }
 
 html.light-mode .prose-blog img { border-color: rgba(0,0,0,0.08); }
+
+/* ── Music widget range sliders ─────────────────────────────── */
+.mw-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 20px; /* comfortable touch/click area; track is drawn thinner */
+  background: transparent;
+  cursor: pointer;
+}
+.mw-range:disabled { cursor: default; opacity: 0.4; }
+
+.mw-range::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    #3b82f6 0%,
+    #22d3ee var(--mw-fill, 0%),
+    rgba(255,255,255,0.09) var(--mw-fill, 0%)
+  );
+}
+.mw-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  margin-top: -4px;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  transition: transform 0.15s ease;
+}
+.mw-range:hover::-webkit-slider-thumb,
+.mw-range:focus-visible::-webkit-slider-thumb { transform: scale(1.15); }
+
+.mw-range::-moz-range-track {
+  height: 5px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.09);
+}
+.mw-range::-moz-range-progress {
+  height: 5px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #3b82f6, #22d3ee);
+}
+.mw-range::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  transition: transform 0.15s ease;
+}
+.mw-range:hover::-moz-range-thumb,
+.mw-range:focus-visible::-moz-range-thumb { transform: scale(1.15); }
+
+html.light-mode .mw-range::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    #2563eb 0%,
+    #0891b2 var(--mw-fill, 0%),
+    rgba(15,23,42,0.12) var(--mw-fill, 0%)
+  );
+}
+html.light-mode .mw-range::-moz-range-track    { background: rgba(15,23,42,0.12); }
+html.light-mode .mw-range::-moz-range-progress { background: linear-gradient(to right, #2563eb, #0891b2); }
