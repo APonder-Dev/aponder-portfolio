@@ -1,8 +1,10 @@
 'use client'
 
-import { Terminal, Github, Building2, Mail, MessageSquare, Coffee, ArrowUpRight } from 'lucide-react'
-import type { ContactContent } from '@/lib/content-types'
-import { DEFAULT_CONTACT } from '@/lib/content-defaults'
+import { useEffect, useState } from 'react'
+import { Terminal, ArrowUpRight } from 'lucide-react'
+import type { ContactContent, FooterLink } from '@/lib/content-types'
+import { DEFAULT_CONTACT, DEFAULT_FOOTER_LINKS } from '@/lib/content-defaults'
+import { footerIcon } from '@/lib/footer-icons'
 
 const QUICK_LINKS = [
   { label: 'Blog',            href: '/blog',                           external: false },
@@ -13,6 +15,16 @@ const QUICK_LINKS = [
 
 export default function Footer({ contact: contactProp }: { contact?: ContactContent }) {
   const ct = contactProp ?? DEFAULT_CONTACT
+  const [links, setLinks] = useState<FooterLink[]>(
+    DEFAULT_FOOTER_LINKS.map(l => (l.id === 'email' ? { ...l, url: `mailto:${ct.email}` } : l))
+  )
+
+  useEffect(() => {
+    fetch('/api/footer')
+      .then(res => res.json())
+      .then((data: FooterLink[]) => { if (Array.isArray(data) && data.length > 0) setLinks(data) })
+      .catch(() => {})
+  }, [])
   return (
     <footer className="relative border-t border-white/[0.05] bg-dark-950/90 backdrop-blur-sm">
       {/* Top glow line */}
@@ -38,52 +50,25 @@ export default function Footer({ contact: contactProp }: { contact?: ContactCont
               Minecraft Plugin Developer &amp; Software Engineer. Building production-ready plugins, backend systems, and modern web experiences.
             </p>
 
-            {/* Socials */}
-            <div className="flex items-center gap-3 pt-1">
-              <a
-                href={`mailto:${ct.email}`}
-                className="p-2 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 border border-transparent hover:border-blue-500/20 transition-all duration-200"
-                aria-label="Email"
-              >
-                <Mail size={16} />
-              </a>
-              <a
-                href="https://github.com/APonder-Dev"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-lg text-slate-500 hover:text-white hover:bg-white/[0.06] border border-transparent hover:border-white/10 transition-all duration-200"
-                aria-label="GitHub — Personal"
-              >
-                <Github size={16} />
-              </a>
-              <a
-                href="https://github.com/FadedCloud-LLC"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-lg text-slate-500 hover:text-purple-400 hover:bg-purple-500/10 border border-transparent hover:border-purple-500/20 transition-all duration-200"
-                aria-label="GitHub — FadedCloud LLC (org)"
-                title="FadedCloud LLC on GitHub"
-              >
-                <Building2 size={16} />
-              </a>
-              <a
-                href="https://buymeacoffee.com/aponder.dev"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-lg text-slate-500 hover:text-yellow-400 hover:bg-yellow-400/10 border border-transparent hover:border-yellow-400/20 transition-all duration-200"
-                aria-label="Buy me a coffee"
-              >
-                <Coffee size={16} />
-              </a>
-              <a
-                href={ct.discordUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 rounded-lg text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 border border-transparent hover:border-indigo-500/20 transition-all duration-200"
-                aria-label="Discord"
-              >
-                <MessageSquare size={16} />
-              </a>
+            {/* Socials — managed in Admin → Site Content → Footer */}
+            <div className="flex items-center gap-3 pt-1 flex-wrap">
+              {links.map(link => {
+                const Icon     = footerIcon(link.icon)
+                const external = !link.url.startsWith('mailto:')
+                return (
+                  <a
+                    key={link.id}
+                    href={link.url}
+                    target={external ? '_blank' : undefined}
+                    rel={external ? 'noopener noreferrer' : undefined}
+                    className="p-2 rounded-lg text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 border border-transparent hover:border-blue-500/20 transition-all duration-200"
+                    aria-label={link.label}
+                    title={link.label}
+                  >
+                    <Icon size={16} />
+                  </a>
+                )
+              })}
             </div>
           </div>
 

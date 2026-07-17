@@ -56,6 +56,13 @@ export interface ContactContent {
   responseTime: string
 }
 
+export interface FooterLink {
+  id: string
+  label: string
+  url: string
+  icon: string
+}
+
 export interface TestimonialItem {
   quote:    string
   author:   string

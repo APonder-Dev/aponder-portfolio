@@ -51,7 +51,6 @@ export async function generateMetadata(): Promise<Metadata> {
       'custom minecraft plugins',
       'backend developer',
       'APonder',
-      'Illinois USA developer',
       'Folia plugin developer',
       'Purpur plugin developer',
     ],

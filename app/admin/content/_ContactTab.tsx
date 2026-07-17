@@ -62,7 +62,7 @@ export default function ContactTab() {
       </div>
       <div>
         <label className={LABEL}>Location</label>
-        <input value={data.location} onChange={e => set('location', e.target.value)} placeholder="Illinois, USA" className={INPUT} />
+        <input value={data.location} onChange={e => set('location', e.target.value)} placeholder="e.g. Remote" className={INPUT} />
       </div>
       <div>
         <label className={LABEL}>Typical response time</label>

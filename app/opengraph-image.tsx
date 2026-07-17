@@ -67,7 +67,7 @@ export default function Image() {
 
           {/* Stat chips */}
           <div style={{ display: 'flex', gap: 14 }}>
-            {['25+ Projects', '5+ Years', '100% Custom Code', 'Illinois, USA'].map(s => (
+            {['25+ Projects', '5+ Years', '100% Custom Code'].map(s => (
               <div
                 key={s}
                 style={{

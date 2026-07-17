@@ -1,6 +1,7 @@
 import type {
   HeroContent, AboutContent, SkillItem,
   ServiceItem, ProcessStep, FAQItem, ContactContent, TestimonialItem,
+  FooterLink,
 } from './content-types'
 
 export const DEFAULT_HERO: HeroContent = {
@@ -8,7 +9,7 @@ export const DEFAULT_HERO: HeroContent = {
   subtitle: 'I build production-ready Minecraft plugins, backend systems, automation tools, and modern web experiences — engineered for real server loads, long-term maintainability, and clean delivery.',
   cta1Label: 'Start a Project',
   cta2Label: 'View Work',
-  metaLine: 'APONDER  /  DEV BUILD 2026  /  ILLINOIS, USA',
+  metaLine: 'APONDER  /  DEV BUILD 2026',
   stats: [
     { value: '25+',              label: 'Projects Delivered' },
     { value: '1.18 → latest',   label: 'Version Support'    },
@@ -216,6 +217,14 @@ export const DEFAULT_CONTACT: ContactContent = {
   email: 'Anthony@aponder.dev',
   discordHandle: 'aponder',
   discordUrl: 'https://discord.com',
-  location: 'Illinois, USA',
+  location: 'Remote',
   responseTime: '24h',
 }
+
+export const DEFAULT_FOOTER_LINKS: FooterLink[] = [
+  { id: 'email',   label: 'Email',                        url: 'mailto:Anthony@aponder.dev',            icon: 'mail'     },
+  { id: 'github',  label: 'GitHub — Personal',            url: 'https://github.com/APonder-Dev',        icon: 'github'   },
+  { id: 'org',     label: 'GitHub — FadedCloud LLC (org)', url: 'https://github.com/FadedCloud-LLC',    icon: 'building' },
+  { id: 'coffee',  label: 'Buy me a coffee',              url: 'https://buymeacoffee.com/aponder.dev',  icon: 'coffee'   },
+  { id: 'discord', label: 'Discord',                      url: 'https://discord.com',                   icon: 'discord'  },
+]

@@ -10,6 +10,7 @@ import FaqTab      from './_FaqTab'
 import ContactTab  from './_ContactTab'
 import SeoTab          from './_SeoTab'
 import TestimonialsTab from './_TestimonialsTab'
+import FooterTab       from './_FooterTab'
 
 const TABS = [
   { key: 'hero',         label: 'Hero'         },
@@ -19,6 +20,7 @@ const TABS = [
   { key: 'process',      label: 'Process'      },
   { key: 'faq',          label: 'FAQ'          },
   { key: 'contact',      label: 'Contact'      },
+  { key: 'footer',       label: 'Footer'       },
   { key: 'seo',          label: 'SEO'          },
   { key: 'testimonials', label: 'Testimonials' },
 ] as const
@@ -66,6 +68,7 @@ export default function ContentPage() {
       {tab === 'process'  && <ProcessTab />}
       {tab === 'faq'      && <FaqTab />}
       {tab === 'contact'  && <ContactTab />}
+      {tab === 'footer'   && <FooterTab />}
       {tab === 'seo'          && <SeoTab />}
       {tab === 'testimonials' && <TestimonialsTab />}
     </div>

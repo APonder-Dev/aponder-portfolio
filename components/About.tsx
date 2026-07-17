@@ -65,10 +65,6 @@ export default function About({ content }: { content?: AboutContent }) {
                   <div className="text-center mb-7">
                     <h3 className="text-xl font-bold text-white">Anthony Ponder</h3>
                     <p className="text-sm text-slate-400 mt-1">Minecraft Plugin Developer &amp; Software Engineer</p>
-                    <div className="flex items-center justify-center gap-1.5 mt-2">
-                      <div className="w-1 h-1 rounded-full bg-blue-400" />
-                      <span className="text-[11px] text-slate-600 font-mono">Illinois, USA</span>
-                    </div>
                   </div>
 
                   {/* Mini stats */}
