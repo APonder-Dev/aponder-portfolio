@@ -5,7 +5,7 @@ import { db } from '@/lib/db'
 import { logAction } from '@/lib/logger'
 
 const ALLOWED_EXT = new Set(['mp3', 'ogg', 'wav', 'm4a', 'flac'])
-const MAX_BYTES   = 25 * 1024 * 1024 // 25 MB
+const MAX_BYTES   = 128 * 1024 * 1024 // 128 MB
 
 export async function POST(req: NextRequest) {
   let formData: FormData
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   if (!file) return NextResponse.json({ error: 'No file provided.' }, { status: 400 })
 
   if (file.size > MAX_BYTES) {
-    return NextResponse.json({ error: 'File too large (max 25 MB).' }, { status: 400 })
+    return NextResponse.json({ error: 'File too large (max 128 MB).' }, { status: 400 })
   }
 
   const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
