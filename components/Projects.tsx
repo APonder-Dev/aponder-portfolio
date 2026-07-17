@@ -126,12 +126,14 @@ function ProjectCard({ project, onOpen }: { project: Project; onOpen: (p: Projec
       `}
     >
       {/* Top row */}
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.05] border border-white/[0.07]">
-          <Icon size={11} className="text-slate-500" />
-          <span className="text-[11px] text-slate-500 font-mono">{project.typeLabel}</span>
+      <div className="flex items-center justify-between gap-2 mb-5">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.05] border border-white/[0.07] min-w-0">
+          <Icon size={11} className="text-slate-500 shrink-0" />
+          <span className="text-[11px] text-slate-500 font-mono truncate" title={project.typeLabel}>
+            {project.typeLabel}
+          </span>
         </div>
-        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${statusStyle}`}>
+        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border whitespace-nowrap shrink-0 ${statusStyle}`}>
           {project.statusLabel}
         </span>
       </div>
