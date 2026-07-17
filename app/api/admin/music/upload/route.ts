@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
+import { MUSIC_DIR } from '@/lib/uploads'
 import { db } from '@/lib/db'
 import { logAction } from '@/lib/logger'
 
@@ -27,11 +28,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'File type not allowed (mp3, ogg, wav, m4a, flac).' }, { status: 400 })
   }
 
-  const safeName  = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-  const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'music')
+  const safeName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
-  await mkdir(uploadDir, { recursive: true })
-  await writeFile(path.join(uploadDir, safeName), Buffer.from(await file.arrayBuffer()))
+  await mkdir(MUSIC_DIR, { recursive: true })
+  await writeFile(path.join(MUSIC_DIR, safeName), Buffer.from(await file.arrayBuffer()))
 
   const title = (formData.get('title') as string | null)?.trim()
     || file.name.replace(/\.[^.]+$/, '')

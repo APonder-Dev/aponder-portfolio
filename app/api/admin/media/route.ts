@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readdir, unlink, stat } from 'fs/promises'
 import path from 'path'
+import { UPLOADS_DIR } from '@/lib/uploads'
 import { logAction } from '@/lib/logger'
 
-const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+const uploadDir = UPLOADS_DIR
 
 export async function GET() {
   try {

@@ -3,6 +3,7 @@ import { stat } from 'fs/promises'
 import { createReadStream } from 'fs'
 import { Readable } from 'stream'
 import path from 'path'
+import { UPLOADS_DIR } from '@/lib/uploads'
 
 // Files uploaded at runtime are not served by Next.js static handling
 // (public/ is snapshotted at build time, especially with output: 'standalone'),
@@ -24,7 +25,7 @@ const MIME: Record<string, string> = {
   flac: 'audio/flac',
 }
 
-const BASE_DIR = path.join(process.cwd(), 'public', 'uploads')
+const BASE_DIR = UPLOADS_DIR
 
 export async function GET(
   req: NextRequest,

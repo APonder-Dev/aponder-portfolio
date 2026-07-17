@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
+import { UPLOADS_DIR } from '@/lib/uploads'
 import { logAction } from '@/lib/logger'
 
 const ALLOWED_EXT = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'])
@@ -27,10 +28,9 @@ export async function POST(req: NextRequest) {
   }
 
   const safeName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-  const uploadDir = path.join(process.cwd(), 'public', 'uploads')
 
-  await mkdir(uploadDir, { recursive: true })
-  await writeFile(path.join(uploadDir, safeName), Buffer.from(await file.arrayBuffer()))
+  await mkdir(UPLOADS_DIR, { recursive: true })
+  await writeFile(path.join(UPLOADS_DIR, safeName), Buffer.from(await file.arrayBuffer()))
   await logAction('media_uploaded', `${file.name} (${(file.size / 1024).toFixed(1)} KB)`)
 
   return NextResponse.json({ url: `/uploads/${safeName}` })

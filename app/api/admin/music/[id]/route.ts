@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { unlink } from 'fs/promises'
 import path from 'path'
+import { MUSIC_DIR } from '@/lib/uploads'
 import { db } from '@/lib/db'
 import { logAction } from '@/lib/logger'
 
@@ -44,7 +45,7 @@ export async function DELETE(
   const name = existing.url.split('/').pop() ?? ''
   if (name && !name.includes('..')) {
     try {
-      await unlink(path.join(process.cwd(), 'public', 'uploads', 'music', name))
+      await unlink(path.join(MUSIC_DIR, name))
     } catch { /* file already gone */ }
   }
 
