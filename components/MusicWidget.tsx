@@ -22,9 +22,10 @@ interface Prefs {
   muted:   boolean
   open:    boolean
   trackId: number | null
+  paused:  boolean
 }
 
-const DEFAULT_PREFS: Prefs = { volume: 0.5, muted: false, open: false, trackId: null }
+const DEFAULT_PREFS: Prefs = { volume: 0.05, muted: false, open: false, trackId: null, paused: false }
 
 function loadPrefs(): Prefs {
   try {
@@ -54,6 +55,7 @@ export default function MusicWidget() {
   const [ready,    setReady]    = useState(false)
   const [current,  setCurrent]  = useState(0)
   const [duration, setDuration] = useState(0)
+  const [userPaused, setUserPaused] = useState(false)
   const audioRef = useRef<HTMLAudioElement>(null)
 
   // Load tracks + saved per-visitor prefs once.
@@ -68,6 +70,7 @@ export default function MusicWidget() {
         setVolume(prefs.volume)
         setMuted(prefs.muted)
         setOpen(prefs.open)
+        setUserPaused(prefs.paused)
         const saved = data.findIndex(t => t.id === prefs.trackId)
         if (saved >= 0) setIndex(saved)
         setReady(true)
@@ -79,9 +82,9 @@ export default function MusicWidget() {
   // Persist prefs whenever they change.
   useEffect(() => {
     if (!ready) return
-    const prefs: Prefs = { volume, muted, open, trackId: tracks[index]?.id ?? null }
+    const prefs: Prefs = { volume, muted, open, trackId: tracks[index]?.id ?? null, paused: userPaused }
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs)) } catch {}
-  }, [ready, volume, muted, open, index, tracks])
+  }, [ready, volume, muted, open, index, tracks, userPaused])
 
   // Keep the audio element in sync with volume/mute.
   useEffect(() => {
@@ -92,13 +95,41 @@ export default function MusicWidget() {
   }, [volume, muted, tracks.length])
 
   const play = useCallback(() => {
+    setUserPaused(false)
     audioRef.current?.play().then(() => setPlaying(true)).catch(() => setPlaying(false))
   }, [])
 
   const pause = useCallback(() => {
+    setUserPaused(true)
     audioRef.current?.pause()
     setPlaying(false)
   }, [])
+
+  // Autoplay once tracks are loaded, unless this visitor previously paused.
+  // Browsers block audio before the first user gesture, so if the immediate
+  // attempt is rejected, start on the visitor's first click/keypress instead.
+  useEffect(() => {
+    if (!ready || userPaused || tracks.length === 0) return
+
+    let disposed = false
+    const tryPlay = () => {
+      audioRef.current?.play()
+        .then(() => { if (!disposed) setPlaying(true); cleanup() })
+        .catch(() => {})
+    }
+    const onGesture = () => tryPlay()
+    const cleanup = () => {
+      window.removeEventListener('pointerdown', onGesture)
+      window.removeEventListener('keydown', onGesture)
+    }
+
+    window.addEventListener('pointerdown', onGesture)
+    window.addEventListener('keydown', onGesture)
+    tryPlay()
+
+    return () => { disposed = true; cleanup() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready])
 
   const skip = useCallback((dir: -1 | 1) => {
     if (tracks.length === 0) return
