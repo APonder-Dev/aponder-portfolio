@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import Script from 'next/script'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/context/ThemeContext'
@@ -95,7 +96,23 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// Strict format check so a DB value can never inject arbitrary script.
+const GA_ID_RE = /^G-[A-Z0-9]{4,20}$/
+
+async function getGaId(): Promise<string | null> {
+  try {
+    const row = await db.siteContent.findUnique({ where: { key: 'analytics' } })
+    if (!row) return null
+    const { gaId } = JSON.parse(row.value) as { gaId?: string }
+    return gaId && GA_ID_RE.test(gaId) ? gaId : null
+  } catch {
+    return null
+  }
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const gaId = await getGaId()
+
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}>
@@ -106,6 +123,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </ThemeProvider>
         </MotionConfig>
         <Analytics />
+        {gaId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga-init" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${gaId}');`}
+            </Script>
+          </>
+        )}
       </body>
     </html>
   )
