@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Save, Loader2, Check, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Save, Loader2, Check, Plus, Trash2, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
 import type { FooterLink } from '@/lib/content-types'
 import { DEFAULT_FOOTER_LINKS } from '@/lib/content-defaults'
 import { FOOTER_ICONS, FOOTER_ICON_LABELS, footerIcon } from '@/lib/footer-icons'
@@ -9,6 +9,73 @@ import { useToast } from '../_AdminToastContext'
 
 const INPUT = 'w-full px-3 py-2 rounded-lg bg-dark-950 border border-white/[0.08] text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 transition-colors'
 const LABEL = 'block text-[11px] text-slate-500 font-mono uppercase tracking-widest mb-1.5'
+
+// Native <select> options can't contain SVGs, so this is a small custom
+// dropdown that previews each icon next to its name.
+function IconSelect({ value, onChange }: { value: string; onChange: (icon: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const Current = footerIcon(value)
+
+  useEffect(() => {
+    if (!open) return
+    const onOutside = (e: PointerEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('pointerdown', onOutside)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('pointerdown', onOutside)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className={INPUT + ' flex items-center gap-2 cursor-pointer text-left'}
+      >
+        <Current size={14} className="text-blue-400 flex-shrink-0" />
+        <span className="flex-1 truncate">{FOOTER_ICON_LABELS[value] ?? value}</span>
+        <ChevronsUpDown size={13} className="text-slate-600 flex-shrink-0" />
+      </button>
+
+      {open && (
+        <ul
+          role="listbox"
+          className="absolute z-30 mt-1 w-full max-h-60 overflow-y-auto rounded-lg bg-dark-900 border border-white/[0.1] shadow-2xl py-1"
+        >
+          {Object.keys(FOOTER_ICONS).map(key => {
+            const Icon = footerIcon(key)
+            const selected = key === value
+            return (
+              <li key={key} role="option" aria-selected={selected}>
+                <button
+                  type="button"
+                  onClick={() => { onChange(key); setOpen(false) }}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left transition-colors cursor-pointer ${
+                    selected
+                      ? 'bg-blue-500/10 text-blue-300'
+                      : 'text-slate-300 hover:bg-white/[0.05] hover:text-white'
+                  }`}
+                >
+                  <Icon size={14} className={selected ? 'text-blue-400' : 'text-slate-500'} />
+                  <span className="flex-1 truncate">{FOOTER_ICON_LABELS[key] ?? key}</span>
+                  {selected && <Check size={13} className="text-blue-400 flex-shrink-0" />}
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </div>
+  )
+}
 
 export default function FooterTab() {
   const { toast } = useToast()
@@ -126,15 +193,7 @@ export default function FooterTab() {
                 </div>
                 <div>
                   <label className={LABEL}>Icon</label>
-                  <select
-                    value={link.icon}
-                    onChange={e => set(link.id, 'icon', e.target.value)}
-                    className={INPUT + ' cursor-pointer'}
-                  >
-                    {Object.keys(FOOTER_ICONS).map(key => (
-                      <option key={key} value={key}>{FOOTER_ICON_LABELS[key] ?? key}</option>
-                    ))}
-                  </select>
+                  <IconSelect value={link.icon} onChange={icon => set(link.id, 'icon', icon)} />
                 </div>
               </div>
 
