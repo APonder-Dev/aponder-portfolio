@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import {
   Upload, Trash2, Loader2, Music, ChevronUp, ChevronDown,
-  Eye, EyeOff, Check, Pencil, X, Play, Pause,
+  Eye, EyeOff, Check, Pencil, X, Play, Pause, Settings2, Save,
 } from 'lucide-react'
 
 interface Track {
@@ -18,6 +18,119 @@ interface Track {
 
 const focusRing =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70'
+
+interface WidgetSettings {
+  enabled:       boolean
+  autoplay:      boolean
+  defaultVolume: number
+}
+
+function Toggle({ on, onClick, label }: { on: boolean; onClick: () => void; label: string }) {
+  return (
+    <label className="flex items-center justify-between gap-3 cursor-pointer">
+      <span className="text-sm text-slate-300">{label}</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={on}
+        aria-label={label}
+        onClick={onClick}
+        className={`w-9 h-5 rounded-full transition-colors relative flex-shrink-0 cursor-pointer ${focusRing} ${
+          on ? 'bg-blue-500' : 'bg-dark-700 border border-white/[0.1]'
+        }`}
+      >
+        <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${on ? 'translate-x-4' : 'translate-x-0.5'}`} />
+      </button>
+    </label>
+  )
+}
+
+function WidgetSettingsCard() {
+  const [settings, setSettings] = useState<WidgetSettings>({ enabled: true, autoplay: true, defaultVolume: 0.05 })
+  const [loading,  setLoading]  = useState(true)
+  const [saving,   setSaving]   = useState(false)
+  const [saved,    setSaved]    = useState(false)
+
+  useEffect(() => {
+    fetch('/api/admin/content/music_settings')
+      .then(r => r.json())
+      .then(({ value }) => { if (value) setSettings(s => ({ ...s, ...value })) })
+      .finally(() => setLoading(false))
+  }, [])
+
+  const save = async () => {
+    setSaving(true)
+    const res = await fetch('/api/admin/content/music_settings', {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(settings),
+    })
+    setSaving(false)
+    if (res.ok) { setSaved(true); setTimeout(() => setSaved(false), 2000) }
+  }
+
+  return (
+    <div className="bg-dark-900 rounded-xl border border-white/[0.06] p-5 mb-6">
+      <div className="flex items-center gap-2.5 mb-4">
+        <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
+          <Settings2 size={14} className="text-blue-400" />
+        </div>
+        <div>
+          <div className="text-sm font-semibold text-white">Widget Settings</div>
+          <div className="text-xs text-slate-500 mt-0.5">How the player behaves for visitors</div>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="h-24 bg-white/[0.03] rounded-lg animate-pulse" />
+      ) : (
+        <div className="space-y-4 max-w-md">
+          <Toggle
+            on={settings.enabled}
+            onClick={() => setSettings(s => ({ ...s, enabled: !s.enabled }))}
+            label="Show music widget on the site"
+          />
+          <Toggle
+            on={settings.autoplay}
+            onClick={() => setSettings(s => ({ ...s, autoplay: !s.autoplay }))}
+            label="Autoplay for new visitors"
+          />
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-sm text-slate-300">Default volume</span>
+              <span className="text-xs font-mono text-slate-500 tabular-nums">
+                {Math.round(settings.defaultVolume * 100)}%
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={settings.defaultVolume}
+              onChange={e => setSettings(s => ({ ...s, defaultVolume: parseFloat(e.target.value) }))}
+              className={`mw-range w-full ${focusRing}`}
+              style={{ ['--mw-fill' as string]: `${settings.defaultVolume * 100}%` }}
+              aria-label="Default volume"
+            />
+            <p className="text-[11px] text-slate-600 mt-1">
+              Applies to first-time visitors; returning visitors keep their own saved volume.
+            </p>
+          </div>
+
+          <button
+            onClick={save}
+            disabled={saving}
+            className={`flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg text-sm font-semibold hover:from-blue-500 hover:to-cyan-500 transition-all disabled:opacity-50 cursor-pointer ${focusRing}`}
+          >
+            {saving ? <Loader2 size={13} className="animate-spin" /> : saved ? <Check size={13} /> : <Save size={13} />}
+            {saved ? 'Saved!' : saving ? 'Saving…' : 'Save Settings'}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function MusicPage() {
   const [tracks,    setTracks]    = useState<Track[]>([])
@@ -148,6 +261,8 @@ export default function MusicPage() {
           </button>
         </div>
       </div>
+
+      <WidgetSettingsCard />
 
       {error && (
         <div

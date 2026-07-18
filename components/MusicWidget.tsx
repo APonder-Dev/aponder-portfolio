@@ -27,13 +27,14 @@ interface Prefs {
 
 const DEFAULT_PREFS: Prefs = { volume: 0.05, muted: false, open: false, trackId: null, paused: false }
 
-function loadPrefs(): Prefs {
+function loadPrefs(defaultVolume: number): Prefs {
+  const base = { ...DEFAULT_PREFS, volume: defaultVolume }
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return DEFAULT_PREFS
-    return { ...DEFAULT_PREFS, ...(JSON.parse(raw) as Partial<Prefs>) }
+    if (!raw) return base
+    return { ...base, ...(JSON.parse(raw) as Partial<Prefs>) }
   } catch {
-    return DEFAULT_PREFS
+    return base
   }
 }
 
@@ -56,22 +57,24 @@ export default function MusicWidget() {
   const [current,  setCurrent]  = useState(0)
   const [duration, setDuration] = useState(0)
   const [userPaused, setUserPaused] = useState(false)
+  const [autoplayOn, setAutoplayOn] = useState(true)
   const audioRef = useRef<HTMLAudioElement>(null)
 
-  // Load tracks + saved per-visitor prefs once.
+  // Load tracks, admin settings, and saved per-visitor prefs once.
   useEffect(() => {
     let cancelled = false
     fetch('/api/music')
       .then(res => res.json())
-      .then((data: Track[]) => {
-        if (cancelled || !Array.isArray(data)) return
-        setTracks(data)
-        const prefs = loadPrefs()
+      .then((data: { enabled?: boolean; autoplay?: boolean; defaultVolume?: number; tracks?: Track[] }) => {
+        if (cancelled || !data || data.enabled === false || !Array.isArray(data.tracks)) return
+        setTracks(data.tracks)
+        setAutoplayOn(data.autoplay !== false)
+        const prefs = loadPrefs(typeof data.defaultVolume === 'number' ? data.defaultVolume : DEFAULT_PREFS.volume)
         setVolume(prefs.volume)
         setMuted(prefs.muted)
         setOpen(prefs.open)
         setUserPaused(prefs.paused)
-        const saved = data.findIndex(t => t.id === prefs.trackId)
+        const saved = data.tracks.findIndex(t => t.id === prefs.trackId)
         if (saved >= 0) setIndex(saved)
         setReady(true)
       })
@@ -109,7 +112,7 @@ export default function MusicWidget() {
   // Browsers block audio before the first user gesture, so if the immediate
   // attempt is rejected, start on the visitor's first click/keypress instead.
   useEffect(() => {
-    if (!ready || userPaused || tracks.length === 0) return
+    if (!ready || !autoplayOn || userPaused || tracks.length === 0) return
 
     let disposed = false
     const tryPlay = () => {

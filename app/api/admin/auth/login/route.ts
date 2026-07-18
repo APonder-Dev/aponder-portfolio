@@ -2,10 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { signAdminToken, COOKIE } from '@/lib/auth'
 import { hashPassword } from '@/lib/password'
 import { getIp, isRateLimited, resetRateLimit } from '@/lib/rate-limit'
+import { getSecuritySettings, getTotpConfig } from '@/lib/site-settings'
+import { verifyTotp } from '@/lib/totp'
 import { db } from '@/lib/db'
-
-const LOGIN_LIMIT  = 10
-const LOGIN_WINDOW = 15 * 60 * 1000
 
 async function getStoredHash(): Promise<string | null> {
   try {
@@ -15,16 +14,17 @@ async function getStoredHash(): Promise<string | null> {
 }
 
 export async function POST(req: NextRequest) {
-  const ip = getIp(req)
+  const ip  = getIp(req)
+  const sec = await getSecuritySettings()
 
-  if (await isRateLimited(`login:${ip}`, LOGIN_LIMIT, LOGIN_WINDOW)) {
+  if (await isRateLimited(`login:${ip}`, sec.loginLimit, sec.loginWindowMins * 60 * 1000)) {
     return NextResponse.json(
-      { error: 'Too many attempts. Try again in 15 minutes.' },
+      { error: `Too many attempts. Try again in ${sec.loginWindowMins} minutes.` },
       { status: 429 }
     )
   }
 
-  const { password } = await req.json()
+  const { password, code } = await req.json()
   if (!password) {
     return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
   }
@@ -36,6 +36,17 @@ export async function POST(req: NextRequest) {
 
   if (!valid) {
     return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
+  }
+
+  // Second factor, if enabled in Settings.
+  const totp = await getTotpConfig()
+  if (totp.enabled && totp.secret) {
+    if (!code) {
+      return NextResponse.json({ need2fa: true }, { status: 401 })
+    }
+    if (!verifyTotp(totp.secret, String(code))) {
+      return NextResponse.json({ need2fa: true, error: 'Invalid authentication code' }, { status: 401 })
+    }
   }
 
   await resetRateLimit(`login:${ip}`)

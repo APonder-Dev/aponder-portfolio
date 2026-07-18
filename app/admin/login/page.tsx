@@ -2,11 +2,13 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Terminal, Lock, Eye, EyeOff } from 'lucide-react'
+import { Terminal, Lock, Eye, EyeOff, ShieldCheck } from 'lucide-react'
 
 export default function LoginPage() {
   const router  = useRouter()
   const [pw,     setPw]     = useState('')
+  const [code,   setCode]   = useState('')
+  const [need2fa, setNeed2fa] = useState(false)
   const [err,    setErr]    = useState('')
   const [loading, setLoading] = useState(false)
   const [showPw, setShowPw] = useState(false)
@@ -19,14 +21,19 @@ export default function LoginPage() {
     const res = await fetch('/api/admin/auth/login', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ password: pw }),
+      body:    JSON.stringify({ password: pw, ...(code ? { code } : {}) }),
     })
 
     if (res.ok) {
       router.push('/admin')
     } else {
       const data = await res.json()
-      setErr(data.error || 'Invalid password')
+      if (data.need2fa) {
+        setNeed2fa(true)
+        setErr(data.error || '')
+      } else {
+        setErr(data.error || 'Invalid password')
+      }
       setLoading(false)
     }
   }
@@ -71,11 +78,32 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {need2fa && (
+              <div>
+                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2">
+                  Authenticator Code
+                </label>
+                <div className="relative">
+                  <ShieldCheck size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600" />
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={code}
+                    onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="6-digit code"
+                    autoFocus
+                    className="w-full bg-dark-950 border border-white/[0.08] rounded-lg pl-9 pr-4 py-2.5 text-white placeholder-slate-700 focus:border-blue-500/40 focus:outline-none focus:ring-1 focus:ring-blue-500/20 text-sm transition-colors font-mono tracking-widest"
+                  />
+                </div>
+              </div>
+            )}
+
             {err && <p className="text-sm text-red-400">{err}</p>}
 
             <button
               type="submit"
-              disabled={loading || !pw}
+              disabled={loading || !pw || (need2fa && code.length !== 6)}
               className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg text-sm font-semibold hover:from-blue-500 hover:to-cyan-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Signing in…' : 'Sign In'}

@@ -12,6 +12,7 @@ import TableOfContents, { type Heading } from '@/components/TableOfContents'
 import PageHeader from '@/components/PageHeader'
 import ViewTracker from '@/components/ViewTracker'
 import NewsletterSignup from '@/components/NewsletterSignup'
+import { getBlogSettings } from '@/lib/site-settings'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,6 +41,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     select: { title: true, excerpt: true, coverImage: true },
   })
   if (!post) return {}
+
+  // Fall back to the admin-configured default OG image for posts without covers.
+  const { defaultOgImage } = await getBlogSettings()
+  const ogImage = post.coverImage || defaultOgImage
+
   return {
     title:       `${post.title} — APonder.dev`,
     description: post.excerpt || undefined,
@@ -49,13 +55,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.excerpt || undefined,
       type:        'article',
       url:         `https://aponder.dev/blog/${slug}`,
-      ...(post.coverImage ? { images: [{ url: post.coverImage, width: 1200, height: 630 }] } : {}),
+      ...(ogImage ? { images: [{ url: ogImage, width: 1200, height: 630 }] } : {}),
     },
     twitter: {
       card:        'summary_large_image',
       title:       `${post.title} — APonder.dev`,
       description: post.excerpt || undefined,
-      ...(post.coverImage ? { images: [post.coverImage] } : {}),
+      ...(ogImage ? { images: [ogImage] } : {}),
     },
   }
 }
@@ -64,6 +70,8 @@ export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params
   const post = await db.post.findFirst({ where: { slug, published: true, publishedAt: { lte: new Date() } } })
   if (!post) notFound()
+
+  const blogSettings = await getBlogSettings()
 
   const tags     = JSON.parse(post.tags || '[]') as string[]
   const mins     = readingTime(post.content)
@@ -241,7 +249,7 @@ export default async function BlogPostPage({ params }: Props) {
               </div>
             </div>
 
-            <NewsletterSignup />
+            {blogSettings.showNewsletter && <NewsletterSignup />}
 
             <footer className="mt-8 pt-8 border-t border-white/[0.08] flex items-center justify-between flex-wrap gap-4">
               <Link href="/blog" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">
