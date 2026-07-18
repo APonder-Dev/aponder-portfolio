@@ -14,21 +14,33 @@ const GA_ID_RE = /^G-[A-Z0-9]{4,20}$/
 
 // ── Shared bits ──────────────────────────────────────────────────
 
-function Card({ Icon, title, subtitle, children }: {
-  Icon: typeof KeyRound; title: string; subtitle: string; children: ReactNode
+const TONES = {
+  blue:    { icon: 'text-blue-400',    bg: 'bg-blue-500/[0.08]'    },
+  amber:   { icon: 'text-amber-400',   bg: 'bg-amber-500/[0.08]'   },
+  cyan:    { icon: 'text-cyan-400',    bg: 'bg-cyan-500/[0.08]'    },
+  emerald: { icon: 'text-emerald-400', bg: 'bg-emerald-500/[0.08]' },
+  indigo:  { icon: 'text-indigo-400',  bg: 'bg-indigo-500/[0.08]'  },
+  orange:  { icon: 'text-orange-400',  bg: 'bg-orange-500/[0.08]'  },
+  purple:  { icon: 'text-purple-400',  bg: 'bg-purple-500/[0.08]'  },
+} as const
+
+function Card({ Icon, title, subtitle, tone = 'blue', children }: {
+  Icon: typeof KeyRound; title: string; subtitle: string
+  tone?: keyof typeof TONES; children: ReactNode
 }) {
+  const t = TONES[tone]
   return (
-    <div className="bg-dark-900 rounded-xl border border-white/[0.06] p-6">
-      <div className="flex items-center gap-2.5 mb-5">
-        <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
-          <Icon size={14} className="text-blue-400" />
+    <div className="bg-dark-900 rounded-xl border border-white/[0.06] overflow-hidden">
+      <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-white/[0.06]">
+        <div className={`w-8 h-8 rounded-lg ${t.bg} flex items-center justify-center flex-shrink-0`}>
+          <Icon size={14} className={t.icon} />
         </div>
-        <div>
-          <div className="text-sm font-semibold text-white">{title}</div>
-          <div className="text-xs text-slate-500 mt-0.5">{subtitle}</div>
+        <div className="min-w-0">
+          <div className="text-sm font-semibold text-white leading-tight">{title}</div>
+          <div className="text-[11px] text-slate-500 mt-0.5 truncate">{subtitle}</div>
         </div>
       </div>
-      {children}
+      <div className="p-5">{children}</div>
     </div>
   )
 }
@@ -109,10 +121,10 @@ function MaintenanceCard() {
     enabled: false, message: '',
   })
 
-  if (loading) return <Card Icon={Wrench} title="Maintenance Mode" subtitle="Loading…"><div className="h-20 bg-white/[0.03] rounded-lg animate-pulse" /></Card>
+  if (loading) return <Card tone="amber" Icon={Wrench} title="Maintenance Mode" subtitle="Loading…"><div className="h-20 bg-white/[0.03] rounded-lg animate-pulse" /></Card>
 
   return (
-    <Card Icon={Wrench} title="Maintenance Mode" subtitle="Show a 'back soon' page to visitors; /admin stays accessible">
+    <Card tone="amber" Icon={Wrench} title="Maintenance Mode" subtitle="Show a 'back soon' page to visitors; /admin stays accessible">
       <div className="space-y-4">
         <Toggle
           on={data.enabled}
@@ -147,12 +159,12 @@ function SecurityCard() {
     loginLimit: 10, loginWindowMins: 15,
   })
 
-  if (loading) return <Card Icon={ShieldAlert} title="Login Lockout" subtitle="Loading…"><div className="h-20 bg-white/[0.03] rounded-lg animate-pulse" /></Card>
+  if (loading) return <Card tone="orange" Icon={ShieldAlert} title="Login Lockout" subtitle="Loading…"><div className="h-20 bg-white/[0.03] rounded-lg animate-pulse" /></Card>
 
   const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, Math.round(v) || min))
 
   return (
-    <Card Icon={ShieldAlert} title="Login Lockout" subtitle="Rate-limit failed admin login attempts per IP">
+    <Card tone="orange" Icon={ShieldAlert} title="Login Lockout" subtitle="Rate-limit failed admin login attempts per IP">
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -238,10 +250,10 @@ function TwoFactorCard() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  if (loading) return <Card Icon={ShieldCheck} title="Two-Factor Authentication" subtitle="Loading…"><div className="h-20 bg-white/[0.03] rounded-lg animate-pulse" /></Card>
+  if (loading) return <Card tone="emerald" Icon={ShieldCheck} title="Two-Factor Authentication" subtitle="Loading…"><div className="h-20 bg-white/[0.03] rounded-lg animate-pulse" /></Card>
 
   return (
-    <Card Icon={ShieldCheck} title="Two-Factor Authentication" subtitle="Require an authenticator-app code at login (TOTP)">
+    <Card tone="emerald" Icon={ShieldCheck} title="Two-Factor Authentication" subtitle="Require an authenticator-app code at login (TOTP)">
       <div className="space-y-4">
         <div className={`flex items-center gap-2 text-sm ${enabled ? 'text-emerald-400' : 'text-slate-500'}`}>
           <span className={`w-2 h-2 rounded-full ${enabled ? 'bg-emerald-400' : 'bg-slate-600'}`} />
@@ -348,10 +360,10 @@ function BlogCard() {
     postsPerPage: 0, defaultOgImage: '', showNewsletter: true,
   })
 
-  if (loading) return <Card Icon={FileText} title="Blog Defaults" subtitle="Loading…"><div className="h-20 bg-white/[0.03] rounded-lg animate-pulse" /></Card>
+  if (loading) return <Card tone="indigo" Icon={FileText} title="Blog Defaults" subtitle="Loading…"><div className="h-20 bg-white/[0.03] rounded-lg animate-pulse" /></Card>
 
   return (
-    <Card Icon={FileText} title="Blog Defaults" subtitle="Pagination, share image fallback, and newsletter section">
+    <Card tone="indigo" Icon={FileText} title="Blog Defaults" subtitle="Pagination, share image fallback, and newsletter section">
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -429,10 +441,10 @@ function RedirectsCard() {
     }
   }
 
-  if (loading) return <Card Icon={ArrowRightLeft} title="Redirects" subtitle="Loading…"><div className="h-20 bg-white/[0.03] rounded-lg animate-pulse" /></Card>
+  if (loading) return <Card tone="cyan" Icon={ArrowRightLeft} title="Redirects" subtitle="Loading…"><div className="h-20 bg-white/[0.03] rounded-lg animate-pulse" /></Card>
 
   return (
-    <Card Icon={ArrowRightLeft} title="Redirects" subtitle="Send old URLs to new ones (applies within ~10s of saving)">
+    <Card tone="cyan" Icon={ArrowRightLeft} title="Redirects" subtitle="Send old URLs to new ones (applies within ~10s of saving)">
       <div className="space-y-3">
         {rules.length === 0 && (
           <p className="text-sm text-slate-600">No redirects yet.</p>
@@ -528,7 +540,7 @@ function AnalyticsCard() {
   }
 
   return (
-    <Card Icon={BarChart3} title="Google Analytics" subtitle="GA4 tracking loads on all public pages when an ID is set">
+    <Card tone="purple" Icon={BarChart3} title="Google Analytics" subtitle="GA4 tracking loads on all public pages when an ID is set">
       <form onSubmit={handleSave} className="space-y-4">
         <div>
           <label htmlFor="ga-id" className={LABEL}>Measurement ID</label>
@@ -674,27 +686,40 @@ function PasswordCard() {
 
 export default function SettingsPage() {
   return (
-    <div className="max-w-2xl">
-      <div className="mb-8">
+    <div className="max-w-5xl space-y-8">
+      <div>
         <h1 className="text-2xl font-bold text-white">Settings</h1>
         <p className="text-slate-500 text-sm mt-1">Site behavior, security, and account settings</p>
       </div>
 
-      <div className="space-y-6">
-        <MaintenanceCard />
-        <RedirectsCard />
-        <BlogCard />
-        <AnalyticsCard />
+      {/* Site */}
+      <section>
+        <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest font-mono mb-3">Site</h2>
+        <div className="grid lg:grid-cols-2 gap-4 items-start">
+          <div className="space-y-4">
+            <MaintenanceCard />
+            <AnalyticsCard />
+          </div>
+          <div className="space-y-4">
+            <BlogCard />
+            <RedirectsCard />
+          </div>
+        </div>
+      </section>
 
-        <div className="pt-2">
-          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest font-mono mb-4">Security</h2>
-          <div className="space-y-6">
+      {/* Security */}
+      <section>
+        <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest font-mono mb-3">Security</h2>
+        <div className="grid lg:grid-cols-2 gap-4 items-start">
+          <div className="space-y-4">
             <TwoFactorCard />
             <SecurityCard />
+          </div>
+          <div className="space-y-4">
             <PasswordCard />
           </div>
         </div>
-      </div>
+      </section>
     </div>
   )
 }
