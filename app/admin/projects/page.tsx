@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { projects as STATIC } from '@/data/projects'
-import { Eye, EyeOff, Plus, Trash2, X, Pencil, Check, Loader2, GripVertical } from 'lucide-react'
+import { Eye, EyeOff, Plus, Trash2, X, Pencil, Check, Loader2, GripVertical, ChevronUp, ChevronDown } from 'lucide-react'
 
 const COLORS = ['blue', 'cyan', 'emerald', 'indigo', 'purple', 'orange', 'amber', 'slate', 'red', 'teal', 'sky', 'pink', 'yellow']
 const IN = 'w-full bg-dark-950 border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm placeholder-slate-700 focus:border-blue-500/40 focus:outline-none focus:ring-1 focus:ring-blue-500/20 transition-colors'
@@ -211,6 +211,16 @@ export default function ProjectsAdminPage() {
     await persistOrder(next)
   }
 
+  // Arrow-button reorder — works on touch devices where drag-and-drop doesn't.
+  const moveRow = async (i: number, dir: -1 | 1) => {
+    const target = i + dir
+    if (target < 0 || target >= order.length) return
+    const next = [...order]
+    ;[next[i], next[target]] = [next[target], next[i]]
+    setOrder(next)
+    await persistOrder(next)
+  }
+
   // ── Static project actions ────────────────────────────────────
   const toggleHide = async (projectId: string) => {
     const isHidden = hidden.includes(projectId)
@@ -364,11 +374,31 @@ export default function ProjectsAdminPage() {
                 }`}>
                   {isStatic ? 'static' : 'custom'}
                 </span>
+                <span className="flex items-center shrink-0" onDragStart={e => e.preventDefault()}>
+                  <button
+                    onClick={() => moveRow(i, -1)}
+                    disabled={i === 0}
+                    draggable={false}
+                    className="p-1.5 text-slate-600 hover:text-white hover:bg-white/[0.06] rounded disabled:opacity-25 disabled:hover:text-slate-600 disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-default"
+                    aria-label={`Move ${name} up`}
+                  >
+                    <ChevronUp size={14} />
+                  </button>
+                  <button
+                    onClick={() => moveRow(i, 1)}
+                    disabled={i === order.length - 1}
+                    draggable={false}
+                    className="p-1.5 text-slate-600 hover:text-white hover:bg-white/[0.06] rounded disabled:opacity-25 disabled:hover:text-slate-600 disabled:hover:bg-transparent transition-colors cursor-pointer disabled:cursor-default"
+                    aria-label={`Move ${name} down`}
+                  >
+                    <ChevronDown size={14} />
+                  </button>
+                </span>
               </div>
             )
           })}
         </div>
-        <p className="text-[11px] text-slate-700 mt-2 font-mono">Drag rows to reorder. Applies immediately to the portfolio.</p>
+        <p className="text-[11px] text-slate-700 mt-2 font-mono">Drag rows or use the arrows to reorder. Applies immediately to the portfolio.</p>
       </section>
 
       {/* ── Static projects ─────────────────────────────── */}
